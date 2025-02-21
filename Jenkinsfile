@@ -7,7 +7,7 @@ pipeline {
     
     environment {
         DOCKER_IMAGE_NAME = 'calculator'
-        GITHUB_REPO_URL = 'https://github.com/kuldeepchamoli/repo.git' // Replace with actual repo URL
+        GITHUB_REPO_URL = 'https://github.com/kuldeepchamoli/SPE_MINIPROJECT.git' // Replace with actual repo URL
     }
     
     stages {
