@@ -44,8 +44,8 @@ pipeline {
             steps {
                 script{
                     docker.withRegistry('', 'DockerHubCred') {
-                    sh 'docker tag sci-calculator kuldeep2026/scientific_calculator_spe:latest'
-                    sh 'docker push kuldeep2026/scientific_calculator_spe'
+                    sh 'docker tag calculator:latest kuldeep2026/calculator:latest'
+                    sh 'docker push kuldeep2026/calculator:latest'
                     }
                  }
             }
