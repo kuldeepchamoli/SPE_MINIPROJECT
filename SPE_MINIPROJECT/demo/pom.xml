@@ -39,7 +39,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.example.Main</mainClass>
+                            <mainClass>com.example.demo.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
