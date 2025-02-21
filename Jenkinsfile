@@ -1,65 +1,70 @@
-pipeline { 
+pipeline {
     agent any
-    
-    tools {
-        maven 'Maven-3.8.8' // Use the exact name set in Jenkins
-    }
-    
     environment {
-        DOCKER_IMAGE_NAME = 'calculator'
-        GITHUB_REPO_URL = 'https://github.com/kuldeepchamoli/SPE_MINIPROJECT.git' // Replace with actual repo URL
+        DOCKER_IMAGE_NAME = 'sci-calculator'
+        GITHUB_REPO_URL = 'https://github.com/kuldeepchamoli/SPE_MINIPROJECT.git'
+        DOCKERHUB_USERNAME = 'kuldeep2026'
+        DOCKERHUB_PASSWORD = 'Gurujani@2000'
+        LANG = 'en_US.UTF-8'
+        LC_ALL = 'en_US.UTF-8'
     }
-    
+
     stages {
-        stage('Checkout') {
+        stage('Check out from the Remote Repository') {
             steps {
                 script {
                     git branch: 'main', url: "${GITHUB_REPO_URL}"
                 }
             }
         }
-        
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-        
-        stage('Build Docker Image') {
+
+        stage('Maven Build') {
+                    steps {
+                        sh 'mvn clean install'
+                    }
+                }
+
+        stage('Building Docker Image') {
             steps {
                 script {
                     docker.build("${DOCKER_IMAGE_NAME}", '.')
                 }
             }
         }
-        
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('', 'DockerHubCred') {
-                        sh 'docker tag calculator kuldeep2026/calculator:latest'
-                        sh 'docker push kuldeep2026/calculator:latest'
+
+        stage('Login to Dockerhub') {
+                    steps {
+                        withCredentials([usernamePassword(credentialsId: 'DockerHubCred', passwordVariable: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKERHUB_USERNAME')]) {
+                            sh "docker login -u ${env.DOCKERHUB_USERNAME} -p ${env.DOCKERHUB_PASSWORD}"
+                        }
                     }
                 }
+
+        stage('Push the Docker Image from Local') {
+            steps {
+                script{
+                    docker.withRegistry('', 'DockerHubCred') {
+                    sh 'docker tag sci-calculator kuldeep2026/scientific_calculator_spe:latest'
+                    sh 'docker push kuldeep2026/scientific_calculator_spe'
+                    }
+                 }
             }
         }
-        
+
         stage('Run Ansible Playbook') {
             steps {
                 script {
                     ansiblePlaybook(
-                        playbook: 'deploy.yml',
-                        inventory: 'inventory.ini'
-                    )
+                        playbook: 'Deploy.yml',
+                        inventory: 'inventory'
+                     )
                 }
             }
         }
     }
+    post{
+        always{
+            mail bcc: '', body: 'Build Status Changed', cc: '', from: '', replyTo: '', subject: 'Build Jenkins Calculator', to: 'kuldeepchamoli889@gmail.com'
+        }
+    }
 }
-
