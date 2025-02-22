@@ -56,7 +56,7 @@ pipeline {
                 script {
                     ansiblePlaybook(
                         playbook: 'Deploy.yml',
-                        inventory: 'inventory'
+                        inventory: 'inventory.ini'
                      )
                 }
             }
